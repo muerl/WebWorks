@@ -18,6 +18,10 @@ package blackberry.web.widget;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import net.rim.device.api.notification.NotificationsConstants;
 import net.rim.device.api.notification.NotificationsManager;
 import net.rim.device.api.system.ApplicationDescriptor;
@@ -54,6 +58,21 @@ public class Widget extends UiApplication implements GlobalEventListener {
         initialize();
         _locationURI = locationURI;
 
+        NodeList list = wConfig.getConfigXML().getElementsByTagName("rim:orientation");
+        if(list.getLength() > 0){
+        	NamedNodeMap a = list.item(0).getAttributes();
+        	if(a.getLength() > 0){
+        		Node modeNode = a.getNamedItem("mode");
+        		String mode = modeNode.getNodeValue();
+        		if(mode == null || mode.length() == 0 || mode.equalsIgnoreCase("auto")){}
+        			//doesn't matter Ignore this
+        		else if(mode.equalsIgnoreCase("landscape")){
+        			net.rim.device.api.ui.Ui.getUiEngineInstance().setAcceptableDirections(net.rim.device.api.system.Display.DIRECTION_LANDSCAPE);
+        		} else if(mode.equalsIgnoreCase("portrait")){
+        			net.rim.device.api.ui.Ui.getUiEngineInstance().setAcceptableDirections(net.rim.device.api.system.Display.DIRECTION_PORTRAIT);
+        		}
+    		}
+        }
         // Create PageManager
         PageManager pageManager = new PageManager( this, (WidgetConfigImpl) _wConfig );
 

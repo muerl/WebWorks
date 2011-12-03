@@ -15,6 +15,7 @@
  */
 package blackberry.web.widget.impl;
 
+import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -365,23 +366,38 @@ public abstract class WidgetConfigImpl implements WidgetConfig {
                 return null;
             }
             try {
-                // Obtain the Browser field config
-                BrowserFieldConfig bfConfig = getBrowserFieldConfig();
-
+            	
+            	/**
+            	 * why is this coded this way?  it does not seem to make sense to me ...
+            	 * 
+            	 * wouldn't it make more sense just to open the file the "normal" way?
+            	 */
+            	boolean oldway = false;
                 // Create doc builder
                 DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-                // Parse
-                Object o = bfConfig.getProperty( BrowserFieldConfig.CONTROLLER );
-                if( o instanceof BrowserFieldController ) {
-                    BrowserFieldController bfController = (BrowserFieldController) o;
-
-                    // Create request for config.xml file
-                    BrowserFieldRequest request = new BrowserFieldRequest( WidgetUtil.getLocalPath( _configXML ) );
-                    InputConnection inputConn = bfController.handleResourceRequest( request );
-
-                    // Create a Document object out of the config.xml
-                    _configXMLDoc = docBuilder.parse( inputConn.openDataInputStream() );
+            	InputStream inputStream = null;
+				if(oldway){
+	                // Obtain the Browser field config
+	                BrowserFieldConfig bfConfig = getBrowserFieldConfig();
+	
+	
+	                // Parse
+	                Object o = bfConfig.getProperty( BrowserFieldConfig.CONTROLLER );
+	                if( o instanceof BrowserFieldController ) {
+	                    BrowserFieldController bfController = (BrowserFieldController) o;
+	
+	                    // Create request for config.xml file
+	                    BrowserFieldRequest request = new BrowserFieldRequest( WidgetUtil.getLocalPath( _configXML ) );
+	                    InputConnection inputConn = bfController.handleResourceRequest( request );
+	                    inputStream = inputConn.openDataInputStream();
+	                }
+	                
+            	} else {
+            		inputStream = docBuilder.getClass().getResourceAsStream("/"+ _configXML );
+            	}
+            	if(inputStream != null){
+            	// Create a Document object out of the config.xml
+                    _configXMLDoc = docBuilder.parse( inputStream );
                 }
 
             } catch( Exception e ) {

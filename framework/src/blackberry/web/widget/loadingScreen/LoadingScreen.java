@@ -51,7 +51,7 @@ public class LoadingScreen extends MainScreen {
         
         if( _widgetConfigImpl.getBackgroundImage().length() != 0 ) {
             // Set background image
-            EncodedImage backgroundImage = EncodedImage.getEncodedImageResource( _widgetConfigImpl.getBackgroundImage() );
+            EncodedImage backgroundImage = EncodedImage.getEncodedImageResource( getPlatformSpecific(_widgetConfigImpl.getBackgroundImage()) );
             if( backgroundImage != null ) {
             	
             	// Resize the image to the display size.
@@ -108,7 +108,19 @@ public class LoadingScreen extends MainScreen {
         }
     }
 
-    protected void sublayout( int width, int height ) {
+    private String getPlatformSpecific(String backgroundImage) {
+    	int h = Display.getHeight();
+    	int w = Display.getWidth();
+    	int index = backgroundImage.lastIndexOf('.');
+    	StringBuffer buf = new StringBuffer(backgroundImage.substring(0,index-1));
+    	buf.append(w);
+    	buf.append('x');
+    	buf.append(h);
+    	buf.append(backgroundImage.substring(index));
+        return buf.toString();
+	}
+
+	protected void sublayout( int width, int height ) {
         // Set _hfm vertically center of the screen by setting its top margin
         if( _hfm != null ) {
             int topEmptySpace = ( Display.getHeight() - _hfm.getPreferredHeight() ) / 2;
